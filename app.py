@@ -93,7 +93,7 @@ def create_student():
         email = request.form["email"]
         phone_number = request.form["phone_number"]
         address = request.form["address"]
-        user_id = session['user_id']  # Get user_id from the session
+        user_id = session['user_id']  
 
         cursor.execute(
             "INSERT INTO student_info (first_name, last_name, dob, email, phone_number, address, user_id) "
@@ -101,9 +101,10 @@ def create_student():
             (first_name, last_name, dob, email, phone_number, address, user_id)
         )
         connection.commit()
-        return render_template("home.html", message="Student added successfully")
+        return jsonify({"message":"data inserted sucessfully"})
     
-    return render_template("home.html")
+    return jsonify({"message":"data not inserted"})
+
 
 
 @app.route('/view_students',methods=["POST","GET"])
@@ -112,7 +113,41 @@ def view_students():
     students=cursor.fetchall()
     return jsonify({"students":students})
 
-@app.route
+@app.route('/update_student/<int:student_id>',methods=["POST","GET"])
+def update_student(student_id):
+    if request.method=="POST":
+        cursor.execute("SELECT * FROM student_info WHERE student_id=%s",(student_id,))
+        student=cursor.fetchone()
+        if student:
+            first_name = request.form["first_name"]
+            last_name = request.form["last_name"]
+            dob = request.form["dob"]
+            email = request.form["email"]
+            phone_number = request.form["phone_number"]
+            address = request.form["address"]
+            cursor.execute(
+                "UPDATE student_info SET first_name=%s, last_name=%s, dob=%s, email=%s, phone_number=%s, address=%s "
+                "WHERE student_id=%s",
+                (first_name, last_name, dob, email, phone_number, address, student_id)
+            )
+            return jsonify({"message":"updated sucessfully"})
+        return jsonify({"message":"student_id not found"})
+    
+
+    
+@app.route('/delete_student/<int:student_id>',methods=["POST","GET"])
+def delete_student(student_id):
+    
+    cursor.execute("SELECT * FROM student_info WHERE student_id=%s",(student_id,))
+    student=cursor.fetchone()
+    if student:
+    
+        cursor.execute("DELETE FROM student_info WHERE student_id=%s",(student_id,))
+        connection.commit()
+        return jsonify({"message":"deleted sucessfully"})
+    return jsonify({"message":"student_id not found"})
+
+
 
 
 if __name__ == "__main__":
