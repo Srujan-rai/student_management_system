@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DataNest</title>
+  <link rel="icon" type="image/x-icon" href='{{url_for('static',filename='images/icon.jpeg')}}'>
+  <style>
+    body {
+      font-family: Ari  al, sans-serif;
+      background-color: #202020;
+      color: #ffffff;
+      margin:0;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 25px;
+    }
+
+    form {
+      background: #282828;
+      width: max-content;
+      height: max-content;
+      margin: 0 auto;
+      padding: 50px; 
+      margin-top: 10%;
+      padding-bottom: 30px;
+      padding-top:10px;
+      box-shadow: 0px 0px 3px #a0a0a0;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      row-gap: 20px;
+      align-items: center;
+      border-radius: 10px;
+      transition: 0.2s
+    }
+
+    form:hover{
+      box-shadow: 0px 0px 4px #a0a0a0;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      background: none;
+      border: none;
+      color:#c0c0c0;
+      outline: none;
+      border:solid 1px #606060;
+      border-radius: 3px; 
+    }
+
+    input::placeholder{
+      
+      color: #c0c0c0;
+    }
+
+    button {
+      width: 50%;
+      border-radius: 5px;
+      background-color: #000099;
+      color: #fff;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: solid 1px #000066;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+    button:hover{
+      background-color: #0000a1;
+    }
+
+    .create-user-form {
+      display: none;
+    }
+
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <form action="/create_user" method="post">
+  <h1>Create user</h1>
+    <input type="text" name="new_username" placeholder="Enter Username">
+    <input type="password" name="new_password" placeholder="Enter Password">
+    <button class="button3" type="submit">Create User</button>
+</form>
+
+
+
+<script>
+
+  function displayPopup(message) {
+    alert(message);
+  }
+
+
+  var errorMessage = "{{ message }}";
+  if (errorMessage) {
+    displayPopup(errorMessage);
+  }
+</script>
+</body>
+
+</html>
