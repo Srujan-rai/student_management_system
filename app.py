@@ -1,14 +1,11 @@
 import mysql.connector
 from mysql.connector import Error
-from flask import Flask, redirect, render_template, request, url_for, session, flash,jsonify
+from flask import Flask, redirect, render_template, request, url_for, session, jsonify
 import hashlib
 import secrets
 
-
 app = Flask(__name__)
-
-app.secret_key = secrets.token_hex(16)  
-
+app.secret_key = secrets.token_hex(16)
 
 def create_connection():
     try:
@@ -25,7 +22,6 @@ def create_connection():
         print(f"Error: {str(e)}")
         return None
 
-
 connection = create_connection()
 cursor = connection.cursor()
 
@@ -35,30 +31,24 @@ def login():
         username = request.form["username"]
         password = request.form["password"]
 
-        if username != '':
+        if username:
             cursor.execute("SELECT user_id, password FROM login_info WHERE username=%s", (username,))
             user = cursor.fetchone()
 
             if user:
-                user_id = user[0]
-                stored_password = user[1]
-
+                user_id, stored_password = user
                 if hashlib.sha256(password.encode()).hexdigest() == stored_password:
-                    # Store user_id in the session
                     session['user_id'] = user_id
                     session['username'] = username
-                    return render_template('home.html', message="Welcome to the Student Management System")
+                    return redirect(url_for('home'))
                 else:
                     return render_template('login.html', message='Invalid password')
             else:
                 return render_template('login.html', message='Invalid username')
-        else:
-            return render_template('login.html', message="Please enter a valid username.")
     
     return render_template("login.html")
 
-
-@app.route('/create_user', methods=["POST", "GET"])
+@app.route('/create_user', methods=["GET", "POST"])
 def create_user():
     if request.method == "POST":
         new_username = request.form["new_username"]
@@ -66,7 +56,7 @@ def create_user():
 
         hashed_password = hashlib.sha256(new_password.encode()).hexdigest()
 
-        if new_username != '' and new_username != new_password:
+        if new_username and new_username != new_password:
             try:
                 cursor.execute(
                     "INSERT INTO login_info (username, password) VALUES (%s, %s)",
@@ -76,24 +66,36 @@ def create_user():
                 return render_template('login.html', message="User created successfully")
             except mysql.connector.IntegrityError:
                 return render_template('create_user.html', message='Username already exists')
-        else:
-            return render_template('create_user.html', message="Invalid entry! Username and password cannot be empty or the same.")
+    
     return render_template('create_user.html')
 
+@app.route('/home', methods=["GET"])
+def home():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    return render_template('home.html')
 
-@app.route('/create_student', methods=["GET", "POST"])
+@app.route('/create_student', methods=["POST"])
 def create_student():
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
-    if request.method == "POST":
-        first_name = request.form["first_name"]
-        last_name = request.form["last_name"]
-        dob = request.form["dob"]
-        email = request.form["email"]
-        phone_number = request.form["phone_number"]
-        address = request.form["address"]
-        user_id = session['user_id']  
+    first_name = request.form["first_name"]
+    last_name = request.form["last_name"]
+    dob = request.form["dob"]
+    email = request.form["email"]
+    phone_number = request.form["phone_number"]
+    address = request.form["address"]
+    user_id = session['user_id']
+    
+    cursor.execute("SELECT * FROM student_info where email=%s",(email,))
+    existing_user_email=cursor.fetchone()
+    
+    if existing_user_email:
+        return jsonify({"messsage":"email already exists"})
+    
+    else:
 
         cursor.execute(
             "INSERT INTO student_info (first_name, last_name, dob, email, phone_number, address, user_id) "
@@ -101,54 +103,36 @@ def create_student():
             (first_name, last_name, dob, email, phone_number, address, user_id)
         )
         connection.commit()
-        return jsonify({"message":"data inserted sucessfully"})
-    
-    return jsonify({"message":"data not inserted"})
+        return jsonify({"message": "Student added successfully"})
 
-
-
-@app.route('/view_students',methods=["POST","GET"])
+@app.route('/view_students', methods=["GET"])
 def view_students():
     cursor.execute("SELECT * FROM student_info")
-    students=cursor.fetchall()
-    return jsonify({"students":students})
+    students = cursor.fetchall()
+    return render_template('view_students.html', students=students)
 
-@app.route('/update_student/<int:student_id>',methods=["POST","GET"])
+@app.route('/update_student/<int:student_id>', methods=["POST"])
 def update_student(student_id):
-    if request.method=="POST":
-        cursor.execute("SELECT * FROM student_info WHERE student_id=%s",(student_id,))
-        student=cursor.fetchone()
-        if student:
-            first_name = request.form["first_name"]
-            last_name = request.form["last_name"]
-            dob = request.form["dob"]
-            email = request.form["email"]
-            phone_number = request.form["phone_number"]
-            address = request.form["address"]
-            cursor.execute(
-                "UPDATE student_info SET first_name=%s, last_name=%s, dob=%s, email=%s, phone_number=%s, address=%s "
-                "WHERE student_id=%s",
-                (first_name, last_name, dob, email, phone_number, address, student_id)
-            )
-            return jsonify({"message":"updated sucessfully"})
-        return jsonify({"message":"student_id not found"})
-    
+    first_name = request.form["first_name"]
+    last_name = request.form["last_name"]
+    dob = request.form["dob"]
+    email = request.form["email"]
+    phone_number = request.form["phone_number"]
+    address = request.form["address"]
 
-    
-@app.route('/delete_student/<int:student_id>',methods=["POST","GET"])
+    cursor.execute(
+        "UPDATE student_info SET first_name=%s, last_name=%s, dob=%s, email=%s, phone_number=%s, address=%s "
+        "WHERE student_id=%s",
+        (first_name, last_name, dob, email, phone_number, address, student_id)
+    )
+    connection.commit()
+    return jsonify({"message": "Student updated successfully"})
+
+@app.route('/delete_student/<int:student_id>', methods=["POST"])
 def delete_student(student_id):
-    
-    cursor.execute("SELECT * FROM student_info WHERE student_id=%s",(student_id,))
-    student=cursor.fetchone()
-    if student:
-    
-        cursor.execute("DELETE FROM student_info WHERE student_id=%s",(student_id,))
-        connection.commit()
-        return jsonify({"message":"deleted sucessfully"})
-    return jsonify({"message":"student_id not found"})
-
-
-
+    cursor.execute("DELETE FROM student_info WHERE student_id=%s", (student_id,))
+    connection.commit()
+    return jsonify({"message": "Student deleted successfully"})
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=True)
