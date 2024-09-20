@@ -104,7 +104,8 @@ def create_student():
     existing_user_email=cursor.fetchone()
     
     if existing_user_email:
-        return jsonify({"messsage":"email already exists"})
+        return render_template('home.html',message="email already exists")
+        
     
     else:
 
@@ -114,7 +115,7 @@ def create_student():
             (first_name, last_name, dob, email, phone_number, address, user_id)
         )
         connection.commit()
-        return jsonify({"message": "Student added successfully"})
+        return render_template('home.html',message="student added sucessfully")
 
 @app.route('/view_students', methods=["GET"])
 def view_students():
@@ -137,13 +138,13 @@ def update_student(student_id):
         (first_name, last_name, dob, email, phone_number, address, student_id)
     )
     connection.commit()
-    return jsonify({"message": "Student updated successfully"})
+    return redirect(url_for('view_students', message="updated sucessfully"))
 
 @app.route('/delete_student/<int:student_id>', methods=["POST"])
 def delete_student(student_id):
     cursor.execute("DELETE FROM student_info WHERE student_id=%s", (student_id,))
     connection.commit()
-    return jsonify({"message": "Student deleted successfully"})
+    return redirect(url_for('view_students', message="updated sucessfully"))
 
 
 @app.route('/logout',methods=["POST"])

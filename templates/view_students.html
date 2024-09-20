@@ -143,5 +143,18 @@
         </table>
         <a href="{{ url_for('home') }}">Back to Home</a>
     </div>
+    <script>
+
+        function displayPopup(message) {
+          alert(message);
+        }
+    
+  
+        var errorMessage = "{{ message }}";
+        if (errorMessage) {
+          displayPopup(errorMessage);
+        }
+      </script>
+      
 </body>
 </html>
