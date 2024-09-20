@@ -25,6 +25,10 @@ def create_connection():
 connection = create_connection()
 cursor = connection.cursor()
 
+@app.route('/')
+def index():
+    return render_template('login.html')
+
 @app.route('/login', methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -53,19 +57,26 @@ def create_user():
     if request.method == "POST":
         new_username = request.form["new_username"]
         new_password = request.form["new_password"]
+        
+        if new_password!="":
 
-        hashed_password = hashlib.sha256(new_password.encode()).hexdigest()
+            hashed_password = hashlib.sha256(new_password.encode()).hexdigest()
 
-        if new_username and new_username != new_password:
-            try:
-                cursor.execute(
-                    "INSERT INTO login_info (username, password) VALUES (%s, %s)",
-                    (new_username, hashed_password)
-                )
-                connection.commit()
-                return render_template('login.html', message="User created successfully")
-            except mysql.connector.IntegrityError:
-                return render_template('create_user.html', message='Username already exists')
+
+            if new_username and new_username != new_password:
+                try:
+                    cursor.execute(
+                        "INSERT INTO login_info (username, password) VALUES (%s, %s)",
+                        (new_username, hashed_password)
+                    )
+                    connection.commit()
+                    return render_template('login.html', message="User created successfully")
+                except mysql.connector.IntegrityError:
+                    return render_template('create_user.html', message='Username already exists')
+            else:
+                return render_template('create_user.html',messsage="same username and password")
+        else:
+            return render_template('create_user.html',message="invalid password")
     
     return render_template('create_user.html')
 
@@ -133,6 +144,12 @@ def delete_student(student_id):
     cursor.execute("DELETE FROM student_info WHERE student_id=%s", (student_id,))
     connection.commit()
     return jsonify({"message": "Student deleted successfully"})
+
+
+@app.route('/logout',methods=["POST"])
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=True)

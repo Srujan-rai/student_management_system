@@ -2,7 +2,7 @@
 <html>
 <head>
 
-  <title>DataNest</title>
+  <title>Student Management System</title>
   <link rel="icon" type="image/x-icon" href='{{url_for('static',filename='images/icon.jpeg')}}'>
   <style>
     body {
@@ -13,6 +13,7 @@
       background: url('{{ url_for('static', filename='images/100. Chetwode Blue.jpg') }}');
       background-repeat: none;
       background-size: cover;
+      background-color:#202020;
     }
 
 
@@ -85,19 +86,22 @@
     .error {
       color: red;
     }
+    p{
+      text-align:center;
+      color:white;
+    }
     
   </style>
 </head>
 <body>
-  <h1>DataNest</h1>
-  <form action="/login" method="post">
+  <h1>Student Management system</h1>
+  <form action="{{url_for('login')}}" method="post">
     <h1>LogIn</h1>
     <input type="text" name="username" placeholder="Username">
     <input type="password" name="password" placeholder="Password">
     <button type="submit">LogIn</button>
   </form>
-
-
+  <p>Dont have an account? <a href="{{url_for('create_user')}}">Sign up </p>
 
 
     <script>

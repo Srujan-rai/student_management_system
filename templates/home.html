@@ -53,16 +53,19 @@
             border-radius: 5px;
         }
 
-        input[type="submit"] {
+        input[type="submit"],
+        button[type="submit"] {
             background: #35424a;
             color: #ffffff;
             border: none;
             padding: 10px 15px;
             cursor: pointer;
             border-radius: 5px;
+            margin-top: 20px;
         }
 
-        input[type="submit"]:hover {
+        input[type="submit"]:hover,
+        button[type="submit"]:hover {
             background: #007BFF;
         }
 
@@ -80,6 +83,16 @@
             margin-top: 20px;
             color: #777;
         }
+
+        .logout-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .view_student_cla{
+            text-align:center;
+        }
+
     </style>
 </head>
 <body>
@@ -99,9 +112,15 @@
             <input type="submit" value="Add Student">
         </form>
         
-        <h2><a href="{{ url_for('view_students') }}">View Students</a></h2>
+        <h2 class="view_student_cla"><a href="{{ url_for('view_students') }}">View Students</a></h2>
     </div>
-    
+
+    <div class="logout-container">
+        <form method="POST" action="{{ url_for('logout') }}">
+            <button type="submit">Logout</button>
+        </form>
+    </div>
+
     <footer>
         <p>&copy; 2024 Student Management System</p>
     </footer>
