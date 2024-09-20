@@ -9,27 +9,29 @@
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             margin: 0;
-            padding: 20px;
+            padding: 0;
         }
 
         header {
             background: #35424a;
             color: #ffffff;
-            padding: 10px 0;
+            padding: 15px 0;
             text-align: center;
         }
 
         h1 {
             margin: 0;
+            font-size: 24px;
+            letter-spacing: 1px;
         }
 
         .container {
-            max-width: 800px;
-            margin: 20px auto;
+            max-width: 90%;
+            margin: 30px auto;
             background: #ffffff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
         }
 
         table {
@@ -39,14 +41,17 @@
         }
 
         th, td {
-            padding: 10px;
-            text-align: left;
+            padding: 12px;
+            text-align: center;
             border: 1px solid #ddd;
         }
 
         th {
             background: #35424a;
             color: #ffffff;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 1px;
         }
 
         tr:nth-child(even) {
@@ -59,42 +64,85 @@
 
         form {
             display: inline-block;
-            margin-right: 10px;
+            margin: 0;
         }
 
         input[type="text"],
         input[type="email"],
         input[type="date"],
         textarea {
-            width: 100%;
-            padding: 5px;
+            width: 90%;
+            padding: 8px;
             margin: 5px 0;
             border: 1px solid #ccc;
             border-radius: 5px;
+        }
+
+        textarea {
+            resize: vertical;
+            height: 60px;
         }
 
         input[type="submit"] {
             background: #35424a;
             color: #ffffff;
             border: none;
-            padding: 5px 10px;
+            padding: 8px 12px;
+            margin: 10px 0;
             cursor: pointer;
             border-radius: 5px;
+            transition: background 0.3s;
         }
 
         input[type="submit"]:hover {
             background: #007BFF;
         }
 
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
         a {
             display: block;
-            margin-top: 20px;
             text-align: center;
+            margin-top: 20px;
             color: #007BFF;
+            text-decoration: none;
+            font-weight: bold;
         }
 
         a:hover {
             text-decoration: underline;
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                width: 100%;
+                padding: 20px;
+            }
+
+            table th, table td {
+                font-size: 14px;
+            }
+
+            input[type="text"],
+            input[type="email"],
+            input[type="date"],
+            textarea {
+                width: 100%;
+            }
+
+            input[type="submit"] {
+                width: 100%;
+                padding: 10px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
         }
     </style>
 </head>
@@ -124,7 +172,7 @@
                 <td>{{ student[4] }}</td>
                 <td>{{ student[5] }}</td>
                 <td>{{ student[6] }}</td>
-                <td>
+                <td class="action-buttons">
                     <form method="POST" action="{{ url_for('update_student', student_id=student[0]) }}">
                         <input type="text" name="first_name" value="{{ student[1] }}">
                         <input type="text" name="last_name" value="{{ student[2] }}">
@@ -143,18 +191,16 @@
         </table>
         <a href="{{ url_for('home') }}">Back to Home</a>
     </div>
-    <script>
 
+    <script>
         function displayPopup(message) {
-          alert(message);
+            alert(message);
         }
-    
-  
+
         var errorMessage = "{{ message }}";
         if (errorMessage) {
-          displayPopup(errorMessage);
+            displayPopup(errorMessage);
         }
-      </script>
-      
+    </script>
 </body>
 </html>
